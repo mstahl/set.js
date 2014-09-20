@@ -58,4 +58,30 @@ describe('Node', function () {
       expect(right.insert).toHaveBeenCalledWith(150)
     })
   })
+
+  describe('#lookup', function () {
+    it('returns current node if it matches', function () {
+      var node = new Node()
+      node.content = 100
+      expect(node.lookup(100)).toBe(node)
+    })
+    it('recursively calls left.lookup() for object <= this.content', function () {
+      var node = new Node()
+      node.content = 100
+      node.left = new Node()
+
+      spyOn(node.left, 'lookup')
+      node.lookup(50)
+      expect(node.left.lookup).toHaveBeenCalledWith(50)
+    })
+    it('recursively calls right.lookup() for object > this.content', function () {
+      var node = new Node()
+      node.content = 100
+      node.right = new Node()
+
+      spyOn(node.right, 'lookup')
+      node.lookup(150)
+      expect(node.right.lookup).toHaveBeenCalledWith(150)
+    })
+  })
 })

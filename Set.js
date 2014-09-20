@@ -13,6 +13,9 @@ var Set = function () {
 Set.prototype.insert = function (object) {
   return this.root.insert(object)
 }
+Set.prototype.lookup = function (object) {
+  return this.root.lookup(object)
+}
 
 var Node = function () {
   // The actual data this node contains, NULL if this is an empty leaf node
@@ -42,4 +45,9 @@ Node.prototype.insert = function (object) {
     if(this.right === null) this.right = new Node()
     return this.right.insert(object)
   }
+}
+Node.prototype.lookup = function (object) {
+  if(object === this.content) return this
+  else if(object <= this.content) return this.left.lookup(object)
+  else return this.right.lookup(object)
 }
