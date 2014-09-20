@@ -35,6 +35,7 @@ describe('Node', function () {
       expect(node.left).toBe(null)
       expect(node.right).toBe(null)
     })
+
     it('recursively calls left.insert() for content <= this.content', function () {
       var root = new Node()
       var left = new Node()
@@ -46,6 +47,7 @@ describe('Node', function () {
       root.insert(50)
       expect(left.insert).toHaveBeenCalledWith(50)
     })
+
     it('recursively calls right.insert() for content > this.content', function () {
       var root = new Node()
       var right = new Node()
@@ -65,6 +67,7 @@ describe('Node', function () {
       node.content = 100
       expect(node.lookup(100)).toBe(node)
     })
+
     it('recursively calls left.lookup() for object <= this.content', function () {
       var node = new Node()
       node.content = 100
@@ -74,6 +77,7 @@ describe('Node', function () {
       node.lookup(50)
       expect(node.left.lookup).toHaveBeenCalledWith(50)
     })
+
     it('recursively calls right.lookup() for object > this.content', function () {
       var node = new Node()
       node.content = 100
@@ -82,6 +86,49 @@ describe('Node', function () {
       spyOn(node.right, 'lookup')
       node.lookup(150)
       expect(node.right.lookup).toHaveBeenCalledWith(150)
+    })
+  })
+
+  describe('#height', function () {
+    it('returns 1 for a single node', function () {
+      var node = new Node()
+      expect(node.height()).toBe(1)
+    })
+
+    it('calls height on its left and right children if it has children', function () {
+      var node = new Node()
+      node.left = new Node()
+      node.right = new Node()
+      spyOn(node.left, 'height')
+      spyOn(node.right, 'height')
+
+      node.height()
+      expect(node.left.height).toHaveBeenCalled()
+      expect(node.right.height).toHaveBeenCalled()
+    })
+
+    describe('when the left child has greater height than the right one', function () {
+      it('adds one to the left child height', function () {
+        var node = new Node()
+        node.left = new Node()
+        node.right = new Node()
+
+        spyOn(node.left, 'height').and.returnValue(10)
+        spyOn(node.right, 'height').and.returnValue(5)
+        expect(node.height()).toBe(11)
+      })
+    })
+
+    describe('when the right child has greater height than the left one', function () {
+      it('adds one to the right child height', function () {
+        var node = new Node()
+        node.left = new Node()
+        node.right = new Node()
+
+        spyOn(node.left, 'height').and.returnValue(10)
+        spyOn(node.right, 'height').and.returnValue(50)
+        expect(node.height()).toBe(51)
+      })
     })
   })
 })

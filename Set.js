@@ -51,3 +51,12 @@ Node.prototype.lookup = function (object) {
   else if(object <= this.content) return this.left.lookup(object)
   else return this.right.lookup(object)
 }
+Node.prototype.height = function () {
+  var left_height = 0, right_height = 0
+
+  if(this.left !== null) left_height = this.left.height()
+  if(this.right !== null) right_height = this.right.height()
+
+  if(left_height > right_height) return left_height + 1
+  else return right_height + 1
+}
