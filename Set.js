@@ -22,15 +22,8 @@ var Node = function () {
   this.content = null
 
   // Relationships to other nodes
-  this.parent = null
   this.left = null
   this.right = null
-
-  // Auto-balancing variables
-  this.color = 'red'
-
-  // Pointer back to the enclosing set
-  this.set = null
 }
 Node.prototype.height = function () {
   var left_height = 0, right_height = 0
@@ -41,6 +34,43 @@ Node.prototype.height = function () {
   if(left_height > right_height) return left_height + 1
   else return right_height + 1
 }
+// Helper functions for rebalancing trees
+Node.prototype.balance_factor = function () {
+  if(this.content === null) return 0
+
+  var left_height = (typeof(this.left) === 'undefined' || this.left === null) ? 0 : this.left.height()
+  var right_height = (typeof(this.right) === 'undefined' || this.right === null) ? 0 : this.right.height()
+
+  return left_height - right_height
+}
+Node.prototype.rotate_left = function () {
+  if(typeof(this.right) === 'undefined' || this.right === null) return this
+  var pivot = this.right
+  this.right = pivot.left
+  pivot.left = this
+  return pivot
+}
+Node.prototype.rotate_right = function () {
+  if(typeof(this.left) === 'undefined' || this.left === null) return this
+  var pivot = this.left
+  this.left = pivot.right
+  pivot.right = this
+  return pivot
+}
+Node.prototype.rebalance = function () {
+  var tree_balance = this.balance_factor()
+
+  // If we're already balanced, go ahead and just return the input
+  if(tree_balance === -1 || tree_balance === 0 || tree_balance === 1) {
+    return this
+  } else if(tree_balance === 2) {
+    if(this.left.balance_factor() === -1) this.left = this.left.rotate_left()
+    return this.rotate_right()
+  } else {
+    if(this.right.balance_factor() === 1) this.right = this.right.rotate_right()
+    return this.rotate_left()
+  }
+}
 Node.prototype.insert = function (object) {
   if(this.content === null) {
     this.content = object
@@ -48,11 +78,13 @@ Node.prototype.insert = function (object) {
   }
   else if(object <= this.content) {
     if(this.left === null) this.left = new Node()
-    return this.left.insert(object)
+    this.left = this.left.insert(object)
+    return this.rebalance()
   }
   else {
     if(this.right === null) this.right = new Node()
-    return this.right.insert(object)
+    this.right = this.right.insert(object)
+    return this.rebalance()
   }
 }
 Node.prototype.lookup = function (object) {
@@ -60,3 +92,31 @@ Node.prototype.lookup = function (object) {
   else if(object <= this.content) return this.left.lookup(object)
   else return this.right.lookup(object)
 }
+Node.prototype.inspect = function () {
+  // Some little stupid helper functions
+  var indent = function (level) {
+    if(level === 0) return ''
+    else return '  ' + indent(level - 1)
+  }
+  var indenting_inspect = function (indent_level, node) {
+    var string_representation = ''
+    if(node.content !== null) {
+      string_representation += indent(indent_level) + "+-[ " + node.content + " ]\n"
+      if(node.left !== null) string_representation += indenting_inspect(indent_level + 1, node.left)
+      else string_representation += indent(indent_level + 1) + "+-< null >\n"
+      if(node.right !== null) string_representation += indenting_inspect(indent_level + 1, node.right)
+      else string_representation += indent(indent_level + 1) + "+-< null >\n"
+    }
+    else string_representation += indent(indent_level) + "+-< null >\n"
+
+    return string_representation
+  }
+  return indenting_inspect(0, this)
+}
+
+var set = new Set()
+for(var i = 0; i < 100000; ++i) {
+  var x = Math.floor(-500 + 1000 * Math.random())
+  set.insert(x)
+}
+console.log(set.root.height())
