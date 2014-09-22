@@ -2,7 +2,7 @@
  * Set.js
  *
  * A simple Set data structure, guaranteeing O(log n) lookup, insertion, and
- * deletion. Implemented using red-black self-balancing trees.
+ * deletion. Implemented using AVL self-balancing trees.
  *
  * (c) 2014 max thom stahl, released under the MIT license
  */
