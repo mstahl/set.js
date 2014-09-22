@@ -114,9 +114,18 @@ Node.prototype.inspect = function () {
   return indenting_inspect(0, this)
 }
 
-var set = new Set()
-for(var i = 0; i < 100000; ++i) {
-  var x = Math.floor(-500 + 1000 * Math.random())
-  set.insert(x)
+console.log("Loading test data")
+var test_data_set = require('./test_data.json')
+console.log("Benchmarking insertions")
+for(var problem_size = 10000; problem_size <= 50000; problem_size += 10000) {
+  console.log("Problem size = " + problem_size)
+  for(var repetition = 0; repetition < 5; repetition++) {
+    var set = new Set()
+    var before_time = new Date()
+    for(var i = 0; i < problem_size; ++i) {
+      set.insert(test_data_set[i])
+    }
+    var after_time = new Date()
+    console.log("(" + repetition + "): " + (after_time - before_time))
+  }
 }
-console.log(set.root.height())
